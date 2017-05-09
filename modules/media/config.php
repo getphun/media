@@ -29,6 +29,12 @@ return [
         'files' => []
     ],
     
+    '_gates' => [
+        'media' => [
+            'path' => '/media'
+        ]
+    ],
+    
     '_routes' => [
         'media' => [
             'mediaReceiver' => [
