@@ -20,10 +20,14 @@ return [
     '__dependencies' => [
         'core'
     ],
+    '_server' => [
+        'PHP Lib GD' => 'Media\\Library\\Server::gdlib'
+    ],
     '_services' => [],
     '_autoload' => [
         'classes' => [
             'Media\\Controller\\ResizerController'  => 'modules/media/controller/ResizerController.php',
+            'Media\\Library\\Server'                => 'modules/media/library/Server.php',
             'Eventviva\\ImageResize'                => 'modules/media/third-party/ImageResize.php'
         ],
         'files' => []
