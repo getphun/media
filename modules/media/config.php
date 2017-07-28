@@ -28,7 +28,8 @@ return [
         'classes' => [
             'Media\\Controller\\ResizerController'  => 'modules/media/controller/ResizerController.php',
             'Media\\Library\\Server'                => 'modules/media/library/Server.php',
-            'Eventviva\\ImageResize'                => 'modules/media/third-party/ImageResize.php'
+            'Eventviva\\ImageResize'                => 'modules/media/third-party/ImageResize.php',
+            'Media\\Controller\\MediaController'    => 'modules/media/controller/MediaController.php'
         ],
         'files' => []
     ],
@@ -40,6 +41,18 @@ return [
     ],
     
     '_routes' => [
+        'admin' => [
+            'adminMediaFilter' => [
+                'rule' => '/comp/media/filter',
+                'handler' => 'Media\\Controller\\Media::filter'
+            ]
+        ],
+        'site' => [
+            'siteMediaFilter' => [
+                'rule' => '/comp/media/filter',
+                'handler' => 'Media\\Controller\\Media::filter'
+            ]
+        ],
         'media' => [
             'mediaReceiver' => [
                 'rule' => '/:dir1/:dir2/:dir3/:file',
