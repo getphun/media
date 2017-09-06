@@ -54,6 +54,9 @@ return [
             ]
         ],
         'media' => [
+            '404' => [
+                'handler' => 'Media\\Controller\\Media::notFound'
+            ],
             'mediaReceiver' => [
                 'rule' => '/:dir1/:dir2/:dir3/:file',
                 'handler' => 'Media\\Controller\\Resizer::init'

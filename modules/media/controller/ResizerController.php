@@ -11,8 +11,53 @@ use \Eventviva\ImageResize;
 
 class ResizerController extends \Controller
 {
+    private function downloadImage($file_uri){
+        // Should we download the image from live server?
+        $media = $this->config->media ?? [];
+        if(!isset($media['live']))
+            return $this->show404();
+        
+        $file_url = $media['live'] . $file_uri;
+        
+        // download the file
+        $ch = curl_init($file_url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $file_bin = curl_exec($ch);
+        
+        if(curl_errno($ch))
+            return $this->show404();
+        
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        if($http_code != 200)
+            return $this->show404();
+        
+        curl_close($ch);
+        
+        $file_dirs = trim(dirname($file_uri), '/');
+        $file_dirs = explode('/', $file_dirs);
+        
+        $file_dir = BASEPATH;
+        foreach($file_dirs as $dir){
+            $file_dir.= '/' . $dir;
+            if(!is_dir($file_dir))
+                mkdir($file_dir);
+        }
+        
+        $file_abs = BASEPATH . $file_uri;
+        
+        $f = fopen($file_abs, 'w');
+        fwrite($f, $file_bin);
+        fclose($f);
+        
+        $file_mime = mime_content_type($file_abs);
+        
+        header('Content-Type: ' . $file_mime);
+        readfile($file_abs);
+        die;
+    }
+    
     public function altImage(){
-        die('the file not there');
+        return $this->show404();
     }
     
     public function initAction(){
@@ -21,28 +66,28 @@ class ResizerController extends \Controller
         
         // Whoah, I should not be here
         if(is_file($file_abs))
-            die;
+            return $this->show404();
         
         // get target file
         $file_name = basename($file_abs);
         $file_dir  = dirname($file_abs);
         
-        $opts = explode('_', $file_name);
-        if(count($opts) < 2 || count($opts) > 3)
-            return $this->altImage();
+        preg_match('!(.+)_([0-9]*x[0-9]*)?\.([a-z0-9A-Z]+)$!', $file_name, $match);
         
-        $sizes = explode('.', $opts[1]);
+        $file_original = $file_dir . '/';
+        $file_original.= $match ? $match[1] . '.' . $match[3] : $file_name;
         
-        $file_original = $file_dir . '/' . $opts[0] . '.' . $sizes[1];
         if(!is_file($file_original))
-            return $this->altImage();
+            return $this->downloadImage($file);
         
         $file_mime = mime_content_type($file_original);
-        
-        if(!fnmatch('image/*', $file_mime))
+        if(!fnmatch('image/*', $file_mime)){
+            header('Content-Type: ' . $file_mime);
+            readfile($file_abs);
             die;
+        }
         
-        list($t_width, $t_height) = explode('x', $sizes[0]);
+        list($t_width, $t_height) = explode('x', $match[2]);
         list($i_width, $i_height) = getimagesize($file_original);
         
         if(!$t_width && !$t_height)

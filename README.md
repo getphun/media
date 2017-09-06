@@ -16,9 +16,19 @@ return [
             // 'host' => 'cdn.cms.phu', // optional
             'path' => '/media'
         ]
+    ],
+    
+    'media' => [
+        'live' => 'https://www.google.com'
     ]
 ];
 ```
 
 Kemudian, dengan mengakses `HOST/media/[dir]/[dir]/[dir]/[file_name]_[width]x[height].[file_ext]`
 dari browser akan menggenerasi image dengan ukuran yang diminta.
+
+Konfigurasi `media.live` adalah optional untuk men-download media dari live server.
+Hal ini mungkin perlu ketika database lokal development diambil dari live server,
+sementara file media tidak terdownload, opsi ini memungkinkan system mendownload
+media dari live server dan menyimpannya di lokal agar bisa digunakan pada environment
+lokal. Pastikan tidak ada trailing slash (/) di akhir url.

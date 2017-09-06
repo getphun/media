@@ -11,6 +11,10 @@ use Upload\Model\Media;
 
 class MediaController extends \Controller
 {
+    public function notFoundAction(){
+        $this->res->setStatus(404);
+    }
+    
     public function filterAction(){
         if(!module_exists('upload'))
             return $this->ajax(['error'=>'Module upload not installed']);
