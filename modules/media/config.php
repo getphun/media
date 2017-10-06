@@ -41,18 +41,6 @@ return [
     ],
     
     '_routes' => [
-        'admin' => [
-            'adminMediaFilter' => [
-                'rule' => '/comp/media/filter',
-                'handler' => 'Media\\Controller\\Media::filter'
-            ]
-        ],
-        'site' => [
-            'siteMediaFilter' => [
-                'rule' => '/comp/media/filter',
-                'handler' => 'Media\\Controller\\Media::filter'
-            ]
-        ],
         'media' => [
             '404' => [
                 'handler' => 'Media\\Controller\\Media::notFound'
