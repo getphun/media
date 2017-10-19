@@ -99,7 +99,7 @@ class ResizerController extends \Controller
             $t_height = ceil( $t_width * $i_height / $i_width );
         
         $image = new ImageResize($file_original);
-        $image->crop($t_width, $t_height);
+        $image->crop($t_width, $t_height, true);
         
         $image->save($file_abs)->output();
     }
