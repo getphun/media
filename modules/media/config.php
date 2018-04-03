@@ -28,7 +28,8 @@ return [
         'classes' => [
             'Media\\Controller\\ResizerController'  => 'modules/media/controller/ResizerController.php',
             'Media\\Library\\Server'                => 'modules/media/library/Server.php',
-            'Eventviva\\ImageResize'                => 'modules/media/third-party/ImageResize.php',
+            'Gumlet\\ImageResize'                   => 'modules/media/third-party/ImageResize.php',
+            'Gumlet\\ImageResizeException'          => 'modules/media/third-party/ImageResizeException.php',
             'Media\\Controller\\MediaController'    => 'modules/media/controller/MediaController.php'
         ],
         'files' => []
@@ -54,5 +55,9 @@ return [
                 'handler' => 'Media\\Controller\\Resizer::init'
             ]
         ]
+    ],
+    
+    'media' => [
+        'webp' => false
     ]
 ];

@@ -7,7 +7,7 @@
  */
 
 namespace Media\Controller;
-use \Eventviva\ImageResize;
+use Gumlet\ImageResize;
 
 class ResizerController extends \Controller
 {
@@ -15,7 +15,7 @@ class ResizerController extends \Controller
         // Should we download the image from live server?
         $media = $this->config->media ?? [];
         if(!isset($media['live']))
-            return $this->show404();
+            return;
         
         $file_url = $media['live'] . $file_uri;
         
@@ -26,11 +26,11 @@ class ResizerController extends \Controller
         $file_bin = curl_exec($ch);
         
         if(curl_errno($ch))
-            return $this->show404();
+            return;
         
         $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         if($http_code != 200)
-            return $this->show404();
+            return;
         
         curl_close($ch);
         
@@ -50,11 +50,7 @@ class ResizerController extends \Controller
         fwrite($f, $file_bin);
         fclose($f);
         
-        $file_mime = mime_content_type($file_abs);
-        
-        header('Content-Type: ' . $file_mime);
-        readfile($file_abs);
-        die;
+        return new ImageResize($file_abs);
     }
     
     public function altImage(){
@@ -73,35 +69,69 @@ class ResizerController extends \Controller
         $file_name = basename($file_abs);
         $file_dir  = dirname($file_abs);
         
-        preg_match('!(.+)_([0-9]*x[0-9]*)?\.([a-z0-9A-Z]+)$!', $file_name, $match);
+        $compress = false;
         
-        $file_original = $file_dir . '/';
-        $file_original.= $match ? $match[1] . '.' . $match[3] : $file_name;
-        
-        if(!is_file($file_original))
-            return $this->downloadImage($file);
-        
-        $file_mime = mime_content_type($file_original);
-        if(!fnmatch('image/*', $file_mime)){
-            header('Content-Type: ' . $file_mime);
-            readfile($file_abs);
-            die;
+        // should we webp compress the image?
+        if(preg_match('!\.webp$!', $file_name)){
+            if(!$this->config->media['webp'])
+                return $this->show404();
+            
+            $compress = [
+                'file_name' => $file_name,
+                'file_abs'  => $file_abs
+            ];
+            
+            $file_name = preg_replace('!\.webp$!', '', $file_name);
+            $file      = preg_replace('!\.webp$!', '', $file);
+            $file_abs  = $file_dir . '/' . $file_name;
         }
         
-        list($t_width, $t_height) = explode('x', $match[2]);
-        list($i_width, $i_height) = getimagesize($file_original);
+        if(preg_match('!(.+)_([0-9]*x[0-9]*)?\.([a-z0-9A-Z]+)$!', $file_name, $match)){
+            $file_original = $file_dir . '/' . $match[1] . '.' . $match[3];
+        }else{
+            $file_original = $file_dir . '/' . $file_name;
+        }
         
-        if(!$t_width && !$t_height)
-            return $this->altImage();
+        if(!is_file($file_original)){
+            $image = $this->downloadImage($file);
+            
+        }elseif($match){
+            $file_mime = mime_content_type($file_original);
+            if(!fnmatch('image/*', $file_mime)){
+                header('Content-Type: ' . $file_mime);
+                readfile($file_abs);
+                die;
+            }
         
-        if(!$t_width)
-            $t_width = ceil( $t_height * $i_width / $i_height );
-        if(!$t_height)
-            $t_height = ceil( $t_width * $i_height / $i_width );
+            list($t_width, $t_height) = explode('x', $match[2]);
+            list($i_width, $i_height) = getimagesize($file_original);
         
-        $image = new ImageResize($file_original);
-        $image->crop($t_width, $t_height, true);
+            if(!$t_width && !$t_height)
+                return $this->altImage();
         
-        $image->save($file_abs)->output();
+            if(!$t_width)
+                $t_width = ceil( $t_height * $i_width / $i_height );
+            if(!$t_height)
+                $t_height = ceil( $t_width * $i_height / $i_width );
+        
+            $image = new ImageResize($file_original);
+            $image->crop($t_width, $t_height, true);
+        
+            $image->save($file_abs);
+        }else{
+            $image = new ImageResize($file_original);
+        }
+        
+        if(!$image)
+            return $this->show404();
+        
+        if($compress){
+            $image->save($compress['file_abs'], IMAGETYPE_WEBP);
+            $file_abs = $compress['file_abs'];
+        }
+        
+        $file_mime = mime_content_type($file_abs);
+        header('Content-Type: ' . $file_mime);
+        readfile($file_abs);
     }
 }

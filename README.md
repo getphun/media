@@ -19,7 +19,8 @@ return [
     ],
     
     'media' => [
-        'live' => 'https://www.google.com'
+        'live' => 'https://www.google.com',
+        'webp' => false
     ]
 ];
 ```
@@ -32,3 +33,11 @@ Hal ini mungkin perlu ketika database lokal development diambil dari live server
 sementara file media tidak terdownload, opsi ini memungkinkan system mendownload
 media dari live server dan menyimpannya di lokal agar bisa digunakan pada environment
 lokal. Pastikan tidak ada trailing slash (/) di akhir url.
+
+Konfigurasi `media.webp` adalah option untuk menentukan apakah system mendukung konversi
+gambar menjadi `webp` atau tidak.
+
+## Lisensi
+
+Modul ini menggunakan library dari [gumlet/php-image-resize](https://github.com/gumlet/php-image-resize).
+Silahkan mengacu pada library tersebut untuk lisensi.
