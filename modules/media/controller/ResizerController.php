@@ -60,6 +60,7 @@ class ResizerController extends \Controller
     public function initAction(){
         $file = $this->req->uri;
         $file_abs = BASEPATH . $file;
+        $file_abs = urldecode($file_abs);
         
         // Whoah, I should not be here
         if(is_file($file_abs))
@@ -91,9 +92,7 @@ class ResizerController extends \Controller
         }else{
             $file_original = $file_dir . '/' . $file_name;
         }
-
-        $file_original = urldecode($file_original);
-
+        
         if(!is_file($file_original)){
             $image = $this->downloadImage($file);
             
