@@ -91,7 +91,9 @@ class ResizerController extends \Controller
         }else{
             $file_original = $file_dir . '/' . $file_name;
         }
-        
+
+        $file_original = urldecode($file_original);
+
         if(!is_file($file_original)){
             $image = $this->downloadImage($file);
             
@@ -113,7 +115,7 @@ class ResizerController extends \Controller
                 $t_width = ceil( $t_height * $i_width / $i_height );
             if(!$t_height)
                 $t_height = ceil( $t_width * $i_height / $i_width );
-        
+            
             $image = new ImageResize($file_original);
             $image->crop($t_width, $t_height, true);
         
